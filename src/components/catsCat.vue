@@ -5,9 +5,9 @@
         <h1 class="title">{{ title }}</h1>
       </header>
       <div class="content">
-        <article v-for="(cat, index) in cats" :key="index" @click="openModal(cat.id)">
+        <article v-for="(cat, index) in cats" :key="index">
 
-          <div class="info" v-show="showInfo">
+          <div class="info">
             <h3 class="title">{{ cat.race }}</h3>
             <p><span>Color: </span>{{ cat.color }}</p>
             <p><span>Hair: </span>{{ cat.fur_lenght }}</p>
@@ -18,57 +18,30 @@
         </article>
       </div>
     </div>
-
-    <div class="modal" v-show="showModal">
-      <div class="modalHeader">
-        <h1></h1>
-      </div>
-      <div class="modalContent">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      </div>
-      <div class="modalFooter" @click="closeModal">
-        x
-      </div>
-
-    </div>
   </div>
 </template>
 
 <script>
-import db from '../main'
+// import db from '../main'
 
 export default {
   data () {
     return {
       title: 'Cats Gallery',
-      cats: [],
-      race: '',
-      color: '',
-      showInfo: true,
-      showModal: false
+      cats: []
     }
   },
-  firestore () {
-    return {
-      cats: db.collection('cats').orderBy('race')
-    }
-  },
-  methods: {
-    openModal(id) {
-      this.showModal = true;
-      this.$firestore.cats.get(
-        {
-          race: this.race,
-          color: this.color
-        }
-      )
-    },
-    closeModal() {
-      this.showModal = false;
-    }
+  created () {
+    this.$http.get('https://catsanddinos-d1fa7.firebaseio.com/cats.json').then(function(data) {
+      return data.json();
+    }).then(function(data) {
+      var catsArray = [];
+      for(let key in data) {
+        data[key].id = key;
+        catsArray.push(data[key]);
+      }
+      this.cats = catsArray;
+    })
   }
 }
 </script>
@@ -84,9 +57,12 @@ export default {
   article
     display: grid
     grid-template-columns: 60% 40%
-    margin-bottom: 5px
+    align-items: center
+    width: 100%
+    margin-bottom: 15px
     cursor: pointer
     .info
+      height: 100%
       padding: 30px
       color: #52280d
       background: rgba(#12edb2, 0.38)
@@ -99,27 +75,6 @@ export default {
     img
       display: block
       width: 100%
-
-
-.modal
-  position: fixed
-  top: 0
-  left: 0
-  width: 100%
-  height: 100%
-  background: rgba(#222, 0.9)
-  color: #f5f5f5
-  padding: 20% 10%
-  .modalContent
-    line-height: 1.5
-    letter-spacing: 1px
-  .modalFooter
-    margin-top: 30px
-    text-align: right
-    font-size: 46px
-    font-weight: bolder
-    color: #c60000
-    cursor: pointer
 
 
 </style>
